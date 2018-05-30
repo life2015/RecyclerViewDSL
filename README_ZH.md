@@ -18,33 +18,33 @@ PS : I'm still working on the English Docment now. But the comments in the demo 
 
 ```kotlin
 itemManager.refreshAll {
-    if (info.books == null) info.books = listOf()
-    info.books = info.books.sortedBy { it.timeLeft() }
-    if (collasped) {
-        info.books.take(3).forEach {
-            book(it)
+    val books = viewModel.getBooks()
+    val bookShelfs = viewModel.getBookShelfs()
+    header {
+        text = "DSL header"
+        color = Color.BLUE
+    }
+    book.foreach { book ->
+        bookItem {
+            title = if (book.id != 0) book.title else "Empty Book"
+            date = book.returnDate
+            url = book.imageUrl
         }
-        if (info.books.size > 3) {
-            lightText("${info.books.size - 3}本书被折叠 点击显示") {
-                setOnClickListener {
-                    collasped = false
-                    LibraryViewModel.infoLiveData.refresh(CacheIndicator.LOCAL)
-                }
+    }
+    bookShelfs.foreachIndexed { index, bookShelf ->
+        bookShelf {
+            title = "Number$index Shelf - ${bookShelf.name}"
+            size = bookShelf.size
+            url = bookShelf.imageUrl
+            onclick {
+                startActivity<BookShelfActivity>("id" to bookShelf.id)
             }
-        } else lightText("无更多书显示 点击刷新") {
-            setOnClickListener {
-                LibraryViewModel.infoLiveData.refresh(CacheIndicator.LOCAL)
-            }
-        }
-    } else {
-        info.books.forEach {
-            book(it)
-        }
-        lightText("点击折叠图书") {
-            setOnClickListener {
-                collasped = true
-                LibraryViewModel.infoLiveData.refresh(CacheIndicator.LOCAL)
-            }
+        }    
+    }
+    footer {
+        text = "Load More"
+        onClick {
+            loadMore()
         }
     }
 }
