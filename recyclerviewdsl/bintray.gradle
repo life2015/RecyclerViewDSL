@@ -1,0 +1,85 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
+
+def mavenDesc = 'RecyclerViewDSL is a DSL Library for Android RecyclerView'
+def siteUrl = 'https://github.com/life2015/RecyclerViewDSLDemo'
+def gitUrl = 'https://github.com/life2015/RecyclerViewDSLDemo'
+def issueUrl = 'https://github.com/life2015/RecyclerViewDSLDemo/issues'
+
+def licenseIds = ['Apache-2.0']
+
+def developerId = 'retrox'
+def developerName = 'retrox'
+def developerEmail = 'qq976885345@hotmail.com'
+
+def publishedGroupId = 'cn.edu.twt.retrox'
+def artifact = 'recyclerviewdsl'
+def libraryName = 'recyclerviewdsl'
+def publishVersion = '1.0.0'
+group = 'cn.edu.twt.retrox'
+version = '1.0.0'
+
+install {
+    repositories {
+        mavenInstaller {
+            pom.project {
+                name libraryName
+                description mavenDesc
+                url siteUrl
+
+                groupId publishedGroupId
+                artifactId artifact
+                version publishVersion
+
+                developers {
+                    developer {
+                        id developerId
+                        name developerName
+                        email developerEmail
+                    }
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    //archives javadocJar
+    archives sourcesJar
+}
+
+// Bintray
+Properties properties = new Properties()
+try {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+} catch(Exception e) {
+    // nothing
+}
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = 'RecyclerViewDSL'
+        name = libraryName
+        desc = mavenDesc
+        websiteUrl = siteUrl
+        issueTrackerUrl = issueUrl
+        vcsUrl = gitUrl
+        labels = ['android', 'recyclerview', 'dsl']
+        licenses = licenseIds
+        publish = true
+        publicDownloadNumbers = true
+        version {
+            name = '1.0.0'
+        }
+    }
+}
