@@ -1,7 +1,6 @@
 package cn.edu.twt.retrox.recyclerviewdsl
 
 import android.support.v7.util.DiffUtil
-import android.support.v7.util.ListUpdateCallback
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.ViewGroup
@@ -19,7 +18,7 @@ interface ItemController {
     fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: Item)
 }
 
-class ItemAdapter(val itemManager: ItemManager) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), MutableList<Item> by itemManager {
+class ItemAdapter(val itemManager: ItemManagerAbstract) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), MutableList<Item> by itemManager {
 
     init {
         itemManager.observer = this
@@ -42,19 +41,12 @@ fun RecyclerView.withItems(items: List<Item>) {
 
 fun RecyclerView.withItems(init: MutableList<Item>.() -> Unit) = withItems(mutableListOf<Item>().apply(init))
 
-fun RecyclerView.refreshAll(init: MutableList<Item>.() -> Unit) {
-    val list = mutableListOf<Item>().apply(init)
-    var adapter = this.adapter as? ItemAdapter
-    if (adapter == null) {
-        adapter = ItemAdapter(ItemManager())
-        this.adapter = adapter
-    }
-    val manager = adapter.itemManager
-    manager.refreshAll(list)
+interface ItemManagerAbstract : MutableList<Item> {
+    var observer: RecyclerView.Adapter<RecyclerView.ViewHolder>?
 }
 
-class ItemManager(private val delegated: MutableList<Item> = mutableListOf()) : MutableList<Item> by delegated {
-    var observer: RecyclerView.Adapter<RecyclerView.ViewHolder>? = null
+class ItemManager(private val delegated: MutableList<Item> = mutableListOf()) : ItemManagerAbstract {
+    override var observer: RecyclerView.Adapter<RecyclerView.ViewHolder>? = null
     val itemListSnapshot: List<Item> get() = delegated
 
     init {
@@ -102,7 +94,7 @@ class ItemManager(private val delegated: MutableList<Item> = mutableListOf()) : 
     }
 
 
-/*    override val size: Int get() = delegated.size
+    override val size: Int get() = delegated.size
 
     override fun contains(element: Item) = delegated.contains(element)
 
@@ -122,7 +114,7 @@ class ItemManager(private val delegated: MutableList<Item> = mutableListOf()) : 
 
     override fun listIterator(index: Int) = delegated.listIterator(index)
 
-    override fun subList(fromIndex: Int, toIndex: Int) = delegated.subList(fromIndex, toIndex)*/
+    override fun subList(fromIndex: Int, toIndex: Int) = delegated.subList(fromIndex, toIndex)
 
     override fun add(element: Item) =
             delegated.add(element).also {
@@ -203,24 +195,6 @@ class ItemManager(private val delegated: MutableList<Item> = mutableListOf()) : 
         delegated.clear()
         delegated.addAll(elements)
         ensureControllers(elements)
-        result.dispatchUpdatesTo(object : ListUpdateCallback {
-            override fun onChanged(position: Int, count: Int, payload: Any?) {
-                log(tag, "change: pos:$position count:$count payload:$payload")
-            }
-
-            override fun onMoved(fromPosition: Int, toPosition: Int) {
-                log(tag, "move: from pos: $fromPosition  to pos: $toPosition")
-            }
-
-            override fun onInserted(position: Int, count: Int) {
-                log(tag, "insert: pos: $position count: $count")
-            }
-
-            override fun onRemoved(position: Int, count: Int) {
-                log(tag, "remove: pos:$position count:$count")
-            }
-
-        })
         result.dispatchUpdatesTo(observer)
     }
 

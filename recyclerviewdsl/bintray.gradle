@@ -16,9 +16,9 @@ def developerEmail = 'qq976885345@hotmail.com'
 def publishedGroupId = 'cn.edu.twt.retrox'
 def artifact = 'recyclerviewdsl'
 def libraryName = 'recyclerviewdsl'
-def publishVersion = '1.0.0'
+def publishVersion = '1.1.0'
 group = 'cn.edu.twt.retrox'
-version = '1.0.0'
+version = '1.1.0'
 
 install {
     repositories {
@@ -79,7 +79,7 @@ bintray {
         publish = true
         publicDownloadNumbers = true
         version {
-            name = '1.0.0'
+            name = '1.1.0'
         }
     }
 }
