@@ -4,7 +4,7 @@
 
 上一篇文章说了如何把DSL用在项目的布局中，而这篇文章来讲讲怎么把DSL用在Recyclerview中。此框架已经在我的项目中大规模使用，并且极大地提高了Recyclerview列表构建效率和复用能力。
 
-PS : I'm still working on the English Docment now. But the comments in the demo code are written in both Chinese and English.
+PS : I'm still working on the English Document now. But the comments in the demo code are written in both Chinese and English.
 
 ## 特色
 - 轻量级（只有一个Kotlin文件）
